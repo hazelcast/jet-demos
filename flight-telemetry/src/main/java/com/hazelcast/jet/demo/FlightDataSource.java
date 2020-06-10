@@ -1,10 +1,7 @@
 package com.hazelcast.jet.demo;
 
-import com.hazelcast.internal.json.Json;
-import com.hazelcast.internal.json.JsonArray;
-import com.hazelcast.internal.json.JsonObject;
-import com.hazelcast.internal.json.JsonValue;
 import com.hazelcast.internal.util.ExceptionUtil;
+import com.hazelcast.jet.json.JsonUtil;
 import com.hazelcast.jet.pipeline.SourceBuilder;
 import com.hazelcast.jet.pipeline.SourceBuilder.TimestampedSourceBuffer;
 import com.hazelcast.jet.pipeline.StreamSource;
@@ -16,7 +13,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.hazelcast.internal.util.StringUtil.isNullOrEmpty;
@@ -63,9 +62,8 @@ public class FlightDataSource {
         }
         lastPoll = now;
 
-        JsonArray aircraftList = pollForAircraft();
-        aircraftList.values().stream()
-                .map(FlightDataSource::parseAircraft)
+        List<Aircraft> aircraftList = pollForAircraft();
+        aircraftList.stream()
                 .filter(a -> !isNullOrEmpty(a.getReg())) // there should be a reg number
                 // only add new positions to buffer
                 .filter(a -> a.getPosTime() > aircraftLastSeenAt.getOrDefault(a.getId(), 0L))
@@ -78,7 +76,7 @@ public class FlightDataSource {
         logger.info("Polled " + aircraftList.size() + " aircraft, " + buffer.size() + " new positions.");
     }
 
-    private JsonArray pollForAircraft() throws IOException {
+    private List<Aircraft> pollForAircraft() throws IOException {
         HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
         StringBuilder response = new StringBuilder();
         try {
@@ -94,21 +92,12 @@ public class FlightDataSource {
             }
             if (responseCode != 200) {
                 logger.info("API returned error: " + responseCode + " " + response);
-                return new JsonArray();
+                return Collections.emptyList();
             }
         } finally {
             con.disconnect();
         }
-
-        JsonValue value = Json.parse(response.toString());
-        JsonObject object = value.asObject();
-        return object.get("acList").asArray();
-    }
-
-    private static Aircraft parseAircraft(JsonValue ac) {
-        Aircraft aircraft = new Aircraft();
-        aircraft.fromJson(ac.asObject());
-        return aircraft;
+        return JsonUtil.parse(Aircraft.AircraftList.class, response.toString()).acList;
     }
 
     public static StreamSource<Aircraft> flightDataSource(String url, long pollIntervalMillis) {

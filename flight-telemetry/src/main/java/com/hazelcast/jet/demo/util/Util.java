@@ -1,12 +1,5 @@
 package com.hazelcast.jet.demo.util;
 
-import com.hazelcast.internal.json.JsonValue;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static java.util.Collections.EMPTY_LIST;
-
 /**
  * Helper methods for JSON parsing and geographic calculations.
  */
@@ -34,35 +27,35 @@ public class Util {
     public static float JFK_LON = -73.7822222222f;
 
 
-    public static boolean inIstanbul(float lon, float lat) {
+    public static boolean inIstanbul(double lon, double lat) {
         return inBoundariesOf(lon, lat, boundingBox(IST_LON, IST_LAT, 80f));
     }
 
-    public static boolean inLondon(float lon, float lat) {
+    public static boolean inLondon(double lon, double lat) {
         return inBoundariesOf(lon, lat, boundingBox(LHR_LON, LHR_LAT, 80f));
     }
 
-    public static boolean inFrankfurt(float lon, float lat) {
+    public static boolean inFrankfurt(double lon, double lat) {
         return inBoundariesOf(lon, lat, boundingBox(FRA_LON, FRA_LAT, 80f));
     }
 
-    public static boolean inAtlanta(float lon, float lat) {
+    public static boolean inAtlanta(double lon, double lat) {
         return inBoundariesOf(lon, lat, boundingBox(ATL_LON, ATL_LAT, 80f));
     }
 
-    public static boolean inParis(float lon, float lat) {
+    public static boolean inParis(double lon, double lat) {
         return inBoundariesOf(lon, lat, boundingBox(PAR_LON, PAR_LAT, 80f));
     }
 
-    public static boolean inTokyo(float lon, float lat) {
+    public static boolean inTokyo(double lon, double lat) {
         return inBoundariesOf(lon, lat, boundingBox(TOK_LON, TOK_LAT, 80f));
     }
 
-    public static boolean inNYC(float lon, float lat) {
+    public static boolean inNYC(double lon, double lat) {
         return inBoundariesOf(lon, lat, boundingBox(JFK_LON, JFK_LAT, 80f));
     }
 
-    public static double[] boundingBox(float lon, float lat, float radius) {
+    public static double[] boundingBox(double lon, double lat, float radius) {
         double boundingLon1 = lon + radius / Math.abs(Math.cos(Math.toRadians(lat)) * 69);
         double boundingLon2 = lon - radius / Math.abs(Math.cos(Math.toRadians(lat)) * 69);
         double boundingLat1 = lat + (radius / 69);
@@ -70,53 +63,8 @@ public class Util {
         return new double[]{boundingLon1, boundingLat1, boundingLon2, boundingLat2};
     }
 
-    public static boolean inBoundariesOf(float lon, float lat, double[] boundaries) {
+    public static boolean inBoundariesOf(double lon, double lat, double[] boundaries) {
         return !(lon > boundaries[0] || lon < boundaries[2]) &&
                 !(lat > boundaries[1] || lat < boundaries[3]);
     }
-
-
-    public static double asDouble(JsonValue value) {
-        return value == null ? -1.0 : value.asDouble();
-    }
-
-    public static float asFloat(JsonValue value) {
-        return value == null ? -1.0f : value.asFloat();
-    }
-
-    public static int asInt(JsonValue value) {
-        return value == null || !value.isNumber() ? -1 : value.asInt();
-    }
-
-    public static long asLong(JsonValue value) {
-        return value == null ? -1 : value.asLong();
-    }
-
-    public static String asString(JsonValue value) {
-        return value == null ? "" : value.asString();
-    }
-
-    public static boolean asBoolean(JsonValue value) {
-        return value != null && value.asBoolean();
-    }
-
-    public static String[] asStringArray(JsonValue value) {
-        if (value == null) {
-            return new String[]{""};
-        } else {
-            List<JsonValue> valueList = value.asArray().values();
-            List<String> strings = valueList.stream().map(JsonValue::asString).collect(Collectors.toList());
-            return strings.toArray(new String[strings.size()]);
-        }
-    }
-
-    public static List<Double> asDoubleList(JsonValue value) {
-        if (value == null) {
-            return EMPTY_LIST;
-        } else {
-            List<JsonValue> valueList = value.asArray().values();
-            return valueList.stream().filter(JsonValue::isNumber).map(JsonValue::asDouble).collect(Collectors.toList());
-        }
-    }
-
 }

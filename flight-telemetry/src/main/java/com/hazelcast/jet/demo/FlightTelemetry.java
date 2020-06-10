@@ -318,7 +318,7 @@ public class FlightTelemetry {
      * @param lat latitude of the aircraft
      * @return name of the airport
      */
-    private static String getAirport(float lon, float lat) {
+    private static String getAirport(double lon, double lat) {
         if (inLondon(lon, lat)) {
             return "London";
         } else if (inIstanbul(lon, lat)) {

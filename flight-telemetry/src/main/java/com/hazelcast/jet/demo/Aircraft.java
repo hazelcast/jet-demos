@@ -1,6 +1,5 @@
 package com.hazelcast.jet.demo;
 
-import com.hazelcast.internal.json.JsonObject;
 import com.hazelcast.jet.demo.types.EngineMount;
 import com.hazelcast.jet.demo.types.EngineTypes;
 import com.hazelcast.jet.demo.types.Species;
@@ -8,29 +7,14 @@ import com.hazelcast.jet.demo.types.SpeedType;
 import com.hazelcast.jet.demo.types.VerticalSpeedType;
 import com.hazelcast.jet.demo.types.WakeTurbulanceCategory;
 import com.hazelcast.jet.impl.util.Util;
-import com.hazelcast.json.internal.JsonSerializable;
 
 import java.io.Serializable;
-import java.util.Arrays;
-
-import static com.hazelcast.jet.demo.util.Util.asBoolean;
-import static com.hazelcast.jet.demo.util.Util.asFloat;
-import static com.hazelcast.jet.demo.util.Util.asInt;
-import static com.hazelcast.jet.demo.util.Util.asLong;
-import static com.hazelcast.jet.demo.util.Util.asString;
-import static com.hazelcast.jet.demo.util.Util.asStringArray;
+import java.util.List;
 
 /**
  * DTO represents an aircraft.
  */
-public class Aircraft implements JsonSerializable, Serializable {
-
-    enum VerticalDirection {
-        UNKNOWN,
-        CRUISE,
-        ASCENDING,
-        DESCENDING
-    }
+public class Aircraft implements Serializable {
 
     /**
      * The unique identifier of the aircraft
@@ -72,11 +56,11 @@ public class Aircraft implements JsonSerializable, Serializable {
     /**
      * The aircraft's latitude over the ground
      */
-    private float lat;
+    private double lat;
     /**
      * The aircraft's longitude over the ground.
      */
-    private float lon;
+    private double lon;
     /**
      * The time (at UTC) that the position was last reported by the aircraft
      */
@@ -88,7 +72,7 @@ public class Aircraft implements JsonSerializable, Serializable {
     /**
      * The ground speed in knots
      */
-    private float spd;
+    private double spd;
     /**
      * The type of speed that Spd represents.
      */
@@ -124,7 +108,7 @@ public class Aircraft implements JsonSerializable, Serializable {
     /**
      * An array of strings, each being a stopover on the route
      */
-    private String[] stops;
+    private List<String> stops;
     /**
      * The name of the aircraft's operator
      */
@@ -178,7 +162,6 @@ public class Aircraft implements JsonSerializable, Serializable {
      */
     private VerticalDirection verticalDirection = VerticalDirection.UNKNOWN;
 
-
     public long getId() {
         return id;
     }
@@ -215,11 +198,11 @@ public class Aircraft implements JsonSerializable, Serializable {
         return call;
     }
 
-    public float getLat() {
+    public double getLat() {
         return lat;
     }
 
-    public float getLon() {
+    public double getLon() {
         return lon;
     }
 
@@ -231,7 +214,7 @@ public class Aircraft implements JsonSerializable, Serializable {
         return posStale;
     }
 
-    public float getSpd() {
+    public double getSpd() {
         return spd;
     }
 
@@ -263,7 +246,7 @@ public class Aircraft implements JsonSerializable, Serializable {
         return to;
     }
 
-    public String[] getStops() {
+    public List<String> getStops() {
         return stops;
     }
 
@@ -332,49 +315,6 @@ public class Aircraft implements JsonSerializable, Serializable {
     }
 
     @Override
-    public JsonObject toJson() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void fromJson(JsonObject json) {
-        id = asLong(json.get("Id"));
-        tsecs = asLong(json.get("TSecs"));
-        rcvr = asLong(json.get("Rcvr"));
-        icao = asString(json.get("Icao"));
-        reg = asString(json.get("Reg"));
-        alt = asLong(json.get("Alt"));
-        galt = asLong(json.get("GAlt"));
-        talt = asLong(json.get("TAlt"));
-        call = asString(json.get("Call"));
-        lat = asFloat(json.get("Lat"));
-        lon = asFloat(json.get("Long"));
-        posTime = asLong(json.get("PosTime"));
-        posStale = asBoolean(json.get("PosStale"));
-        spd = asFloat(json.get("Spd"));
-        spdType = SpeedType.fromId(asInt(json.get("SpdTyp")));
-        vsi = asLong(json.get("Vsi"));
-        vsiType = VerticalSpeedType.fromId(asInt(json.get("VsiT")));
-        type = asString(json.get("Type"));
-        mdl = asString(json.get("Mdl"));
-        man = asString(json.get("Man"));
-        from = asString(json.get("From"));
-        to = asString(json.get("To"));
-        stops = asStringArray(json.get("Stops"));
-        op = asString(json.get("Op"));
-        opCode = asString(json.get("OpCode"));
-        wtc = WakeTurbulanceCategory.fromId(asInt(json.get("WTC")));
-        engines = asString(json.get("Engines"));
-        engtype = EngineTypes.fromId(asInt(json.get("EngType")));
-        engMount = EngineMount.fromId(asInt(json.get("EngMount")));
-        species = Species.fromId(asInt(json.get("Species")));
-        mil = asBoolean(json.get("Mil"));
-        cou = asString(json.get("Cou"));
-        gnd = asBoolean(json.get("Gnd"));
-        year = asString(json.get("Year"));
-    }
-
-    @Override
     public String toString() {
         return "Aircraft{" +
                 "reg='" + reg + '\'' +
@@ -412,7 +352,7 @@ public class Aircraft implements JsonSerializable, Serializable {
                 ", man='" + man + '\'' +
                 ", from='" + from + '\'' +
                 ", to='" + to + '\'' +
-                ", stops=" + Arrays.toString(stops) +
+                ", stops=" + stops +
                 ", op='" + op + '\'' +
                 ", opCode='" + opCode + '\'' +
                 ", wtc=" + wtc +
@@ -425,5 +365,16 @@ public class Aircraft implements JsonSerializable, Serializable {
                 ", gnd=" + gnd +
                 ", year='" + year + '\'' +
                 '}';
+    }
+
+    enum VerticalDirection {
+        UNKNOWN,
+        CRUISE,
+        ASCENDING,
+        DESCENDING
+    }
+
+    public static class AircraftList {
+        public List<Aircraft> acList;
     }
 }

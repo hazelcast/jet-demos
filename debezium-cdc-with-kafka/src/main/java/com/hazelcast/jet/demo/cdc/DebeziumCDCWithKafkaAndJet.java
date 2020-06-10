@@ -1,9 +1,8 @@
 package com.hazelcast.jet.demo.cdc;
 
-import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.JetInstance;
-import com.hazelcast.jet.Util;
 import com.hazelcast.jet.impl.JetBootstrap;
+import com.hazelcast.jet.json.JsonUtil;
 import com.hazelcast.jet.kafka.KafkaSources;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.Sinks;
@@ -29,14 +28,10 @@ public class DebeziumCDCWithKafkaAndJet {
         properties.setProperty("auto.offset.reset", "earliest");
         Pipeline p = Pipeline.create();
 
-        p.readFrom(KafkaSources.kafka(properties, record -> {
-            HazelcastJsonValue key = new HazelcastJsonValue(record.key().toString());
-            HazelcastJsonValue value = new HazelcastJsonValue(record.value().toString());
-            return Util.entry(key, value);
-        }, "dbserver1.inventory.customers"))
+        p.readFrom(KafkaSources.kafka(properties, "dbserver1.inventory.customers"))
          .withoutTimestamps()
          .peek()
-         .writeTo(Sinks.map("customers"));
+         .writeTo(Sinks.map("customers", JsonUtil::asJsonKey, JsonUtil::asJsonValue));
 
         jet.newJob(p).join();
     }

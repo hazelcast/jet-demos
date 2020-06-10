@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.hazelcast.jet.demos</groupId>
         <artifactId>hazelcast-jet-demos</artifactId>
-        <version>4.1</version>
+        <version>4.2</version>
     </parent>
 
     <name>Twitter Cryptocurrency Sentiment Analysis</name>
@@ -69,11 +69,6 @@
             <artifactId>stanford-corenlp</artifactId>
             <version>3.8.0</version>
             <classifier>models-english</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20180130</version>
         </dependency>
     </dependencies>
 

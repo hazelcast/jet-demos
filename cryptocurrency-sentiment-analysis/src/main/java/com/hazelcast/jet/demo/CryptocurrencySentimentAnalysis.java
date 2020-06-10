@@ -10,6 +10,7 @@ import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.demo.support.CoinType;
 import com.hazelcast.jet.demo.support.CryptoSentimentGui;
 import com.hazelcast.jet.demo.support.SentimentAnalyzer;
+import com.hazelcast.jet.json.JsonUtil;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.ServiceFactory;
 import com.hazelcast.jet.pipeline.StreamStage;
@@ -21,9 +22,6 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import static com.hazelcast.function.Functions.entryKey;
 import static com.hazelcast.jet.Util.entry;
@@ -118,7 +116,7 @@ public class CryptocurrencySentimentAnalysis {
                                 .trackTerms(allCoinMarkers)))
                 .withNativeTimestamps(SECONDS.toMillis(1));
         StreamStageWithKey<Entry<CoinType, Double>, CoinType> tweetsWithSentiment = tweets
-                .map(rawTweet -> new JSONObject(rawTweet).getString("text"))
+                .map(rawTweet -> JsonUtil.getString(rawTweet, "text"))
                 .flatMap(CryptocurrencySentimentAnalysis::flatMapToRelevant)
                 .mapUsingService(sentimentAnalyzerContext(), (analyzer, e1) ->
                         entry(e1.getKey(), analyzer.getSentimentScore(e1.getValue())))
