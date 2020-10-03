@@ -6,8 +6,8 @@
 
     <parent>
         <groupId>com.hazelcast.jet.demos</groupId>
-        <artifactId>hazelcast-jet-demos</artifactId>
-        <version>4.2</version>
+        <artifactId>apache-beam-demos</artifactId>
+        <version>4.3</version>
     </parent>
 
     <groupId>com.hazelcast.jet.demos.train-track</groupId>
@@ -19,7 +19,7 @@
     <description>Tracking a train travelling through Italy</description>
 
     <properties>
-        <label>Train Track (BEAM)</label>
+        <label>Apache Beam - Train Track</label>
 
         <beam.version>2.21.0</beam.version>
 	<hazelcast-jet.version>4.1</hazelcast-jet.version>

@@ -5,13 +5,13 @@
     <parent>
         <groupId>com.hazelcast.jet.demos.train-track</groupId>
         <artifactId>train-track</artifactId>
-        <version>4.2</version>
+        <version>4.3</version>
         <relativePath>..</relativePath>
     </parent>
 
-    <artifactId>train-track-data-feed</artifactId>
-    <name>${label}: Data Feed</name>
-    <description>Creation of IoT GPS data</description>
+    <artifactId>train-track-grid</artifactId>
+    <name>${label}: Execution Grid</name>
+    <description>Hazelcast Jet cluster to use as the Beam runner</description>
 
     <build>
         <plugins>

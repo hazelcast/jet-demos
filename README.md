@@ -16,10 +16,12 @@ current traffic. Uses the trend from week ago to predict traffic now.
 * [Market Data Ingestion](./market-data-ingest) - Uploads a stream of stock market data (prices) from a Kafka topic 
 into an IMDG map. Data is analysed as part of the upload process, calculating the moving averages to detect buy/sell indicators. Input data here is manufactured to ensure such indicators exist, but this is easy to reconnect to real input.
 * [Markov Chain Generator](./markov-chain-generator) Generates a Markov Chain with probabilities based on supplied classical books.
-* [Train Track](./train-track) An [Apache Beam](https://beam.apache.org/) IOT example, tracking a GPS feed from a train.
 * [TensorFlow](./tensorflow) A [TensorFlow](https://www.tensorflow.org/) example showcasing a ML model execution in Hazelcast Jet pipelines.
 * [Debezium Change Data Capture with Apache Kafka](./debezium-cdc-with-kafka) A [Debezium](http://www.debezium.io) example showcasing consumption of CDC events from Apache Kafka in Hazelcast Jet pipelines.
 * [Debezium Change Data Capture without Apache Kafka](./debezium-cdc-without-kafka) A [Debezium](http://www.debezium.io) example showcasing consumption of CDC events directly from Debezium using Kafka Connect source in Hazelcast Jet pipelines.
+* [Apache Beam](https://beam.apache.org/) examples
+    * [Train Track](./apache-beam-demos/train-track) An IOT example, tracking a GPS feed from a train.
+
 
 ## External Demos
 
