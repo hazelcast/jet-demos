@@ -6,7 +6,6 @@
         <groupId>com.hazelcast.jet.demos.train-track</groupId>
         <artifactId>train-track</artifactId>
         <version>4.2</version>
-        <relativePath>..</relativePath>
     </parent>
 
     <artifactId>train-track-beam-runner</artifactId>
@@ -33,6 +32,7 @@
 			<plugin>
         		<groupId>org.apache.maven.plugins</groupId>
         		<artifactId>maven-shade-plugin</artifactId>
+                <version>${maven-shade-plugin.version}</version>
         		<executions>
           			<execution>
             			<phase>package</phase>

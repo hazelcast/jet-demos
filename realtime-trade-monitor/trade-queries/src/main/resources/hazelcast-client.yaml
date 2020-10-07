@@ -1,0 +1,8 @@
+hazelcast-client:
+  properties:
+    hazelcast.logging.type: log4j
+  group:
+    name: jet
+  network:
+    cluster-members:
+      - 127.0.0.1:5701

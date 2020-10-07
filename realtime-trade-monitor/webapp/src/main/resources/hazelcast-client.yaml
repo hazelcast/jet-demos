@@ -1,0 +1,17 @@
+hazelcast-client:
+  properties:
+    hazelcast.logging.type: log4j
+  group:
+    name: jet
+  network:
+    smart-routing: true
+    cluster-members:
+      127.0.0.1:5701
+  connection-strategy:
+    connection-retry:
+      enabled: true
+      initial-backoff-millis: 2000
+      max-backoff-millis: 180000
+      multiplier: 2
+      fail-on-max-backoff: true
+      jitter: 0.5

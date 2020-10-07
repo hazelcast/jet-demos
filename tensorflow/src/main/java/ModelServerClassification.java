@@ -22,27 +22,31 @@ import com.hazelcast.jet.Jet;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.datamodel.Tuple2;
+import com.hazelcast.jet.grpc.GrpcService;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.ServiceFactory;
 import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.Sources;
 import com.hazelcast.map.IMap;
-import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.tensorflow.framework.DataType;
 import org.tensorflow.framework.TensorProto;
+import org.tensorflow.framework.TensorProto.Builder;
 import org.tensorflow.framework.TensorShapeProto;
+import org.tensorflow.framework.TensorShapeProto.Dim;
 import support.WordIndex;
-import tensorflow.serving.Model;
-import tensorflow.serving.Predict;
+import tensorflow.serving.Model.ModelSpec;
+import tensorflow.serving.Predict.PredictRequest;
+import tensorflow.serving.Predict.PredictResponse;
 import tensorflow.serving.PredictionServiceGrpc;
-import tensorflow.serving.PredictionServiceGrpc.PredictionServiceFutureStub;
 
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static com.hazelcast.jet.datamodel.Tuple2.tuple2;
+import static com.hazelcast.jet.grpc.GrpcServices.unaryService;
 
 /**
  * Shows how to enrich a stream of movie reviews with classification using
@@ -52,60 +56,64 @@ import static com.hazelcast.jet.datamodel.Tuple2.tuple2;
 public class ModelServerClassification {
 
     private static Pipeline buildPipeline(String serverAddress, IMap<Long, String> reviewsMap) {
-        ServiceFactory<Tuple2<PredictionServiceFutureStub, WordIndex>, Tuple2<PredictionServiceFutureStub, WordIndex>>
-                tfServingContext = ServiceFactory
+
+        // Service used to convert the review into a prediction request.
+        final ServiceFactory<WordIndex, WordIndex> wordIndexService = ServiceFactory
                 .withCreateContextFn(context -> {
                     WordIndex wordIndex = new WordIndex(context.attachedDirectory("data"));
-                    ManagedChannel channel = ManagedChannelBuilder.forTarget(serverAddress)
-                                                                  .usePlaintext().build();
-                    return Tuple2.tuple2(PredictionServiceGrpc.newFutureStub(channel), wordIndex);
+                    return wordIndex;
                 })
-                .withDestroyContextFn(t -> ((ManagedChannel) t.f0().getChannel()).shutdownNow())
-                .withCreateServiceFn((context, tuple2) -> tuple2);
+                .withCreateServiceFn((ctx, wordIndex) -> wordIndex);
+
+        // GRPC service that calls the Model server.
+        final ServiceFactory<?, ? extends GrpcService<PredictRequest, PredictResponse>> predictionService = unaryService(
+                () -> ManagedChannelBuilder.forTarget(serverAddress).usePlaintext(),
+                channel -> PredictionServiceGrpc.newStub(channel)::predict
+        );
 
         Pipeline p = Pipeline.create();
         p.readFrom(Sources.map(reviewsMap))
-         .map(Map.Entry::getValue)
-         .mapUsingServiceAsync(tfServingContext, 16, true, (t, review) -> {
-             float[][] featuresTensorData = t.f1().createTensorInput(review);
-             TensorProto.Builder featuresTensorBuilder = TensorProto.newBuilder();
+         .map(Entry::getValue)
+         .mapUsingService(wordIndexService, (service, review) -> {
+             float[][] featuresTensorData = service.createTensorInput(review);
+             Builder featuresTensorBuilder = TensorProto.newBuilder();
              for (float[] featuresTensorDatum : featuresTensorData) {
                  for (float v : featuresTensorDatum) {
                      featuresTensorBuilder.addFloatVal(v);
                  }
              }
-             TensorShapeProto.Dim featuresDim1 =
-                     TensorShapeProto.Dim.newBuilder().setSize(featuresTensorData.length).build();
-             TensorShapeProto.Dim featuresDim2 =
-                     TensorShapeProto.Dim.newBuilder().setSize(featuresTensorData[0].length).build();
+             Dim featuresDim1 =
+                     Dim.newBuilder().setSize(featuresTensorData.length).build();
+             Dim featuresDim2 =
+                     Dim.newBuilder().setSize(featuresTensorData[0].length).build();
              TensorShapeProto featuresShape =
                      TensorShapeProto.newBuilder().addDim(featuresDim1).addDim(featuresDim2).build();
-             featuresTensorBuilder.setDtype(org.tensorflow.framework.DataType.DT_FLOAT)
+             featuresTensorBuilder.setDtype(DataType.DT_FLOAT)
                                   .setTensorShape(featuresShape);
              TensorProto featuresTensorProto = featuresTensorBuilder.build();
 
              // Generate gRPC request
              Int64Value version = Int64Value.newBuilder().setValue(1).build();
-             Model.ModelSpec modelSpec =
-                     Model.ModelSpec.newBuilder().setName("reviewSentiment").setVersion(version).build();
-             Predict.PredictRequest request = Predict.PredictRequest.newBuilder()
-                                                                    .setModelSpec(modelSpec)
-                                                                    .putInputs("input_review", featuresTensorProto)
-                                                                    .build();
-
-             return toCompletableFuture(t.f0().predict(request))
-                     .thenApply(response -> {
-                         float classification = response
-                                 .getOutputsOrThrow("dense_1/Sigmoid:0")
-                                 .getFloatVal(0);
-                         // emit the review along with the classification
-                         return tuple2(review, classification);
-                     });
+             ModelSpec modelSpec =
+                     ModelSpec.newBuilder().setName("reviewSentiment").setVersion(version).build();
+             PredictRequest request = PredictRequest.newBuilder()
+                                                    .setModelSpec(modelSpec)
+                                                    .putInputs("input_review", featuresTensorProto)
+                                                    .build();
+             return tuple2(review, request);
          })
+         .mapUsingServiceAsync(predictionService, (service, tuple2) -> service.call(tuple2.f1()).thenApply(response -> {
+             float classification = response
+                     .getOutputsOrThrow("dense_1/Sigmoid:0")
+                     .getFloatVal(0);
+             // emit the review along with the classification
+             return tuple2(tuple2.f0(), classification);
+         }))
          .setLocalParallelism(1) // one worker is enough to drive they async calls
          .writeTo(Sinks.logger());
         return p;
     }
+
 
     public static void main(String[] args) {
         System.setProperty("hazelcast.logging.type", "log4j");

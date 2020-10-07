@@ -1,7 +1,7 @@
 # Running TensorFlow models from Hazelcast Jet
 
 TensorFlow is a popular library to train and use machine learning
-models. We integrate it with Jet to classify stream of events with the
+models. We integrate it with Jet to classify a stream of events with the
 result of a TF model execution.
 
 TensorFlow provides two ways of running models:
@@ -19,7 +19,7 @@ TensorFlow Keras Datasets. We trained a model as described in a
 and save it. The result of the training is in the
 [`data/model`](data/model) subdirectory.
 
-The input of the model is a the text of a review, the output is
+The input of the model is the text of a review, the output is
 probability of the review being positive or negative, a number in range
 of 0..1. The words in the input are encoded using the word index.
 

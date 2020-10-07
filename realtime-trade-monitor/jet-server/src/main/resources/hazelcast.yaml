@@ -1,0 +1,53 @@
+hazelcast:
+  #  license-key:
+  group:
+    name: jet
+  properties:
+    hazelcast.wait.seconds.before.join: 0
+    hazelcast.logging.type: log4j
+    hazelcast.jmx: true
+  network:
+    rest-api:
+      enabled: true
+      endpoint-groups:
+        CLUSTER_READ:
+          enabled: true
+        CLUSTER_WRITE:
+          enabled: true
+        HOT_RESTART:
+          enabled: true
+    port:
+      auto-increment: false
+      port: 8701
+    join:
+      multicast:
+        enabled: false
+      tcp-ip:
+        connection-timeout-seconds: 1
+        enabled: true
+        member-list:
+          - 127.0.0.1
+  #  native-memory:
+  #    enabled: false
+  #    allocator-type: POOLED
+  #    size:
+  #      unit: MEGABYTES
+  #      value: 16384
+  map:
+    trades:
+      #      hot-restart:
+      #        enabled: true
+      in-memory-format: BINARY
+      indexes:
+        # unordered/hash index on the "symbol" attribute.
+        - type: HASH
+          attributes:
+            - "symbol"
+    symbols:
+      in-memory-format: BINARY
+    #      hot-restart:
+    #        enabled: true
+    query1_Results:
+      #      hot-restart:
+      #        enabled: true
+      in-memory-format: BINARY

@@ -1,0 +1,23 @@
+hazelcast-jet:
+  properties:
+    jet.idle.cooperative.min.microseconds: 25
+    jet.idle.cooperative.max.microseconds: 50
+    jet.idle.noncooperative.min.microseconds: 50
+    jet.idle.noncooperative.max.microseconds: 1000
+  instance:
+    flow-control-period: 100
+    backup-count: 1
+    scale-up-delay-millis: 10000
+#    lossless-restart-enabled: true
+
+  edge-defaults:
+    queue-size: 1024
+    packet-size-limit: 16384
+    receive-window-multiplier: 3
+
+  metrics:
+    enabled: true
+    jmx-enabled: true
+    retention-seconds: 5
+    collection-interval-seconds: 5
+    metrics-for-data-structures: true

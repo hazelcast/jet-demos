@@ -14,10 +14,10 @@
         <module>bitcoin-death-cross</module>
         <module>cryptocurrency-sentiment-analysis</module>
         <module>flight-telemetry</module>
-        <module>jetleopard</module>
-        <module>market-data-ingest</module>
+        <module>jet-job-upgrade</module>
         <module>markov-chain-generator</module>
         <module>realtime-image-recognition</module>
+        <module>realtime-trade-monitor</module>
         <module>road-traffic-predictor</module>
         <module>train-track</module>
         <module>tensorflow</module>
@@ -45,6 +45,11 @@
             <id>backup-repo</id>
             <url>https://repo.maven.apache.org/maven2/</url>
         </repository>
+        <repository>
+            <id>private-repository</id>
+            <name>Hazelcast Private Repository</name>
+            <url>https://repository.hazelcast.com/release/</url>
+        </repository>
     </repositories>
 
     <properties>
@@ -52,6 +57,8 @@
         <hazelcast-jet.version>4.2</hazelcast-jet.version>
         <maven.compiler.plugin.version>2.5.1</maven.compiler.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven-shade-plugin.version>3.2.0</maven-shade-plugin.version>
+        <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
     </properties>
 
     <build>
