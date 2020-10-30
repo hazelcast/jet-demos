@@ -27,7 +27,7 @@
     </parent>
 
     <properties>
-        <tensorflow.version>1.12.0</tensorflow.version>
+        <tensorflow.version>1.15.0</tensorflow.version>
         <grpc.version>1.18.0</grpc.version>
     </properties>
 
