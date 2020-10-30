@@ -17,7 +17,7 @@
 		<java.version>1.8</java.version>
 		<kafka_2.11.version>1.0.0</kafka_2.11.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring-boot.version>1.5.9.RELEASE</spring-boot.version>
+		<spring-boot.version>2.3.5.RELEASE</spring-boot.version>
 		<spring-shell.version>1.2.0.RELEASE</spring-shell.version>
 	</properties>
 
