@@ -26,7 +26,7 @@
 
         <!-- These 4 for web UI -->
         <jquery.version>3.4.1</jquery.version>
-        <leaflet.version>1.5.1</leaflet.version>
+        <leaflet.version>1.7.1</leaflet.version>
         <sockjs-client.version>1.1.2</sockjs-client.version>
         <stomp-websocket.version>2.3.3-1</stomp-websocket.version>
 
