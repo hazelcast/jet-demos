@@ -6,7 +6,7 @@
 
     <groupId>com.hazelcast.jet.demos</groupId>
     <artifactId>hazelcast-jet-demos</artifactId>
-    <version>4.3</version>
+    <version>4.4</version>
     <packaging>pom</packaging>
     <name>Hazelcast Jet Demo Applications</name>
 
@@ -49,7 +49,7 @@
 
     <properties>
         <jdk.version>1.8</jdk.version>
-        <hazelcast-jet.version>4.3</hazelcast-jet.version>
+        <hazelcast-jet.version>4.4</hazelcast-jet.version>
         <maven.compiler.plugin.version>2.5.1</maven.compiler.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
