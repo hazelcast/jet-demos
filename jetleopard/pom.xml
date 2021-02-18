@@ -15,7 +15,7 @@
     <properties>
         <!-- Library versions -->
         <junit.version>4.12</junit.version>
-        <jackson.version>2.10.1</jackson.version>
+        <jackson.version>2.12.1</jackson.version>
     </properties>
 
     <build>
